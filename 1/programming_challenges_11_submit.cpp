@@ -2,7 +2,6 @@
 // Description: The 3n + 1 problem: Programming challenges 110101
 
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -17,18 +16,18 @@ int main(){
 }
 
 unsigned int sizeOfThreeNPlusOne(unsigned long n){
-  vector<long> sequence;
+  unsigned int cycle(0);
   while( n != 1 ) {
-    sequence.push_back(n);
     if( n % 2 == 0 ) {
       n = n / 2;
     } else {
       n = n * 3 + 1;
     }
+    cycle++;
   }
-  sequence.push_back(1);
-  return sequence.size();  
+  return cycle;
 }
+
 
 unsigned int maxCycleLength(unsigned long i, unsigned long j){
   unsigned int max_cycle_lenght(0);
