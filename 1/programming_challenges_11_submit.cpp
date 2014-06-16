@@ -10,14 +10,10 @@ unsigned int sizeOfThreeNPlusOne(unsigned long n);
 unsigned int maxCycleLength(unsigned long i, unsigned long j);
 
 int main(){
-  cout << "The 3n + 1 problem" << endl;
-  cout << "size of sequence of 10 is: " << sizeOfThreeNPlusOne(10) << endl; 
-  cout << "i: " << 1 << " j: " << 10 << " maximum cycle lenght " << maxCycleLength(1, 10) << endl;
-  cout << "i: " << 100 << " j: " << 200 << " maximum cycle lenght " << maxCycleLength(100, 200) << endl;  
-  cout << "i: " << 201 << " j: " << 210 << " maximum cycle lenght " << maxCycleLength(201, 210) << endl;
-  cout << "i: " << 900 << " j: " << 1000 << " maximum cycle lenght " << maxCycleLength(900, 1000) << endl;
-  cout << "i: " << 999998 << " j: " << 1000000 << " maximum cycle lenght " << maxCycleLength(999998, 1000000) << endl;
-
+  long i, j;
+  while (cin >> i >> j) {
+    cout << i << " " << j << " " << maxCycleLength(min(i,j), max(i,j)) << endl;
+  }
 }
 
 unsigned int sizeOfThreeNPlusOne(unsigned long n){
@@ -31,14 +27,13 @@ unsigned int sizeOfThreeNPlusOne(unsigned long n){
     }
   }
   sequence.push_back(1);
-  return sequence.size();
-  
+  return sequence.size();  
 }
 
 unsigned int maxCycleLength(unsigned long i, unsigned long j){
   unsigned int max_cycle_lenght(0);
   for(; i <= j; i++){
-    unsigned int k = sizeOfThreeNPlusOne(i);
+    unsigned long k = sizeOfThreeNPlusOne(i);
     if(k > max_cycle_lenght){
       max_cycle_lenght = k;
     }
