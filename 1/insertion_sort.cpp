@@ -4,20 +4,23 @@
 #include <iostream>
 using namespace std;
 
-void Swap(int *a, int *b){
-  int t = *a;
+template<typename T>
+void Swap(T *a, T *b){
+  T t = *a;
   *a = *b;
   *b = t;
 }
 
-void PrintArray(int s[], int size){
+template<typename T>
+void PrintArray(T s[], int size){
   for(int i = 0; i < size; i++){
     cout << s[i] << " ";
   }
   cout << endl;
 }
 
-void InsertionSort(int s[], int n){
+template<typename T>
+void InsertionSort(T s[], int n){
   int i, j;
   for(i = 1; i < n; i++){
     j = i;
@@ -31,11 +34,20 @@ void InsertionSort(int s[], int n){
 
 int main()
 {
-  cout <<  "insertion sort:" << endl;
+  cout <<  "insertion sort: int" << endl;
   int unsorted_array[5] = {2,3,5,4,1};
   cout << "unsorted array: ";
   PrintArray(unsorted_array, 5);
   InsertionSort(unsorted_array, 5);
   cout << "sorted array: ";
   PrintArray(unsorted_array, 5);
+
+  cout <<  "insertion sort: char" << endl;
+  char unsorted_char_array[] = "insertionsort";
+  cout << "unsorted array: ";
+  PrintArray(unsorted_char_array, 13);
+  InsertionSort(unsorted_char_array, 13);
+  cout << "sorted array: ";
+  PrintArray(unsorted_char_array, 13);
+
 }
