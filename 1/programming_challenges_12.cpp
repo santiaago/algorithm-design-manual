@@ -4,8 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
-#include <limits>
 #include <cmath>
+#include <math.h>
+#include <iomanip>
 
 using namespace std;
 const double kEpsilon = 0.01;
@@ -13,25 +14,36 @@ const double kEpsilon = 0.01;
 bool zeros(vector<double> v);
 double pround(double x, int precision);
 void printExpenses(vector<double> expenses);
+double totalExchangedToEqualize(vector<double> expenses);
 
 int main(){
   cout << "The trip" << endl;
 
   unsigned int number_students(0);
-  cin >> number_students;
-
-  vector<double> expenses(number_students);  // holds trip expenses.
-  double expense(0);                         // read current expense.
-
-  // read trip expense until '0'
-  unsigned int current_index_expense(0);
-  while (cin >> expense && expense != 0) {
-    expenses[current_index_expense] = expense;
-    current_index_expense++;
+  vector<double> exchanged;
+  while(cin >> number_students && number_students != 0){
+    vector<double> expenses(number_students);  // holds trip expenses.
+    double expense(0.0);                       // read current expense.
+    // read trip expense until '0'
+    unsigned int current_index_expense(0);
+    while (number_students > 0 && cin >> expense) {
+      expenses[current_index_expense] = expense*100;
+      current_index_expense++;
+      number_students--;
+    }
+    exchanged.push_back(totalExchangedToEqualize(expenses));
   }
+  for(double e : exchanged){
+    cout << "$"  << fixed << setprecision(2) << e/double(100.0) << endl;
+  }
+}
 
+double totalExchangedToEqualize(vector<double> expenses){
+  unsigned int number_students(expenses.size());
+  
   double total_expenses = accumulate(expenses.begin(), expenses.end(), 0.0);
-  double avg_expenses = pround(total_expenses / double(number_students), 2);
+  double avg_expenses;
+  modf(total_expenses / double(number_students) , &avg_expenses);
 
   cout << "total expenses: " << total_expenses << " avg expenses: " << avg_expenses << endl;
 
@@ -45,7 +57,7 @@ int main(){
 
   double exchange(0.0);
   // loop until the expense distribution is near zero.
-  while(!zeros(expense_distribution)){//to_distribute){
+  while(!zeros(expense_distribution)){
     printExpenses(expense_distribution);
 
     int index(0);  // index of first negative expense.
@@ -61,6 +73,7 @@ int main(){
     cout << "selected distribution: " << expense_distribution[index] << endl;
     
     // search in all students the first one that needs to get back some money as he gave too much.
+    bool found(false);
     for(int i = 0; i < number_students; i++){
 
       if(expense_distribution[i] > kEpsilon){
@@ -79,16 +92,18 @@ int main(){
 	  expense_distribution[index] = 0;
 	}
 	cout << "current exchange: " << exchange << endl;
+	found = true;
 	break;
       }
+    }
+    if(!found){
+      break;
     }
   }
 
   cout << "amount exchanged: " << exchange << endl;
-  for(int i = 0 ; i < number_students ; i++){
-    cout << expense_distribution[i] << " | ";
-  }
-  cout << endl;
+  printExpenses(expense_distribution);
+  return exchange;
 }
 
 bool zeros(vector<double> v){
