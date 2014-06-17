@@ -43,7 +43,7 @@ double totalExchangedToEqualize(vector<double> expenses){
   
   double total_expenses = accumulate(expenses.begin(), expenses.end(), 0.0);
   double avg_expenses;
-  modf(total_expenses / double(number_students) , &avg_expenses);
+  modf(round(total_expenses / double(number_students)) , &avg_expenses);
 
   cout << "total expenses: " << total_expenses << " avg expenses: " << avg_expenses << endl;
 

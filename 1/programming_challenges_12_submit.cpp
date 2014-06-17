@@ -40,7 +40,7 @@ double totalExchangedToEqualize(vector<double> expenses){
   
   double total_expenses = accumulate(expenses.begin(), expenses.end(), 0.0);
   double avg_expenses;
-  modf(total_expenses / double(number_students) , &avg_expenses);
+  modf(round(total_expenses / double(number_students)) , &avg_expenses);
 
   vector<double> expense_distribution(expenses);  // holds the expense distribution to make for each student.
 
