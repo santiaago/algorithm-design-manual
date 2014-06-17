@@ -6,12 +6,16 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <limits>
 
 using namespace std;
 
 template<typename T>
 void printVector(vector<T> v);
 void printMap(map<string, unsigned int> m);
+string getLowestCandidate(map<string, unsigned int> candidates);
+string getHighestCandidate(map<string, unsigned int> m);
+bool areCandidatesTied(map<string, unsigned int> candidates);
 
 int main(){
   cout << "Australian Voting" << endl;
@@ -19,6 +23,7 @@ int main(){
   cin >> num_cases;
   string line;
   getline (cin, line);
+  vector<string> winners;
   while(num_cases > 0){
     unsigned int num_candidates(0);
     cin >> num_candidates;
@@ -31,9 +36,7 @@ int main(){
       num_candidates--;
     }
     printVector(candidates);
-    //printMap(candidate_votes);
-    // read up to 1000 lines
-    
+    // read up to 1000 lines    
     string vote;
     unsigned int num_votes(0);
     cin.ignore();
@@ -57,15 +60,47 @@ int main(){
       printVector(current_vote);
       num_votes++;
     }
-    // printMap(candidate_votes);
     for(auto t : candidate_votes){
       cout << t.first << " | ";
       for(auto t2 : t.second){
 	cout << "\t" << t2.first << " : " << t2.second << endl;
       } 
     }
+    double mayority = num_votes/double(2.0);
+    bool has_winner(false);
+    while(!has_winner){
+      for(auto t : candidate_votes[1]){
+	if(t.second > mayority){
+	  winners.push_back(t.first);
+	  has_winner = true;
+	  break;
+	}
+      }
+      if(!has_winner){
+	string highest_candidate = getHighestCandidate(candidate_votes[1]);
+	string lowest_candidate = getLowestCandidate(candidate_votes[1]);
+	unsigned int votes = candidate_votes[1][lowest_candidate];
+	map<string, unsigned int>::iterator to_remove;
+	to_remove = candidate_votes[1].find(lowest_candidate);
+	candidate_votes[1].erase(to_remove);
+	candidate_votes[1][highest_candidate] += votes;
+      }
+      if(areCandidatesTied(candidate_votes[1])){
+	for(auto c : candidate_votes[1]){
+	  winners.push_back(c.first);
+	}
+	has_winner = true;
+      }
+    }
+    
+    for(auto w : winners){
+      cout << w << endl;
+    }
     cout << "case done " << endl;
     num_cases--;
+  }
+  for(int i = 0; i < winners.size(); i++){
+    cout << winners[i] << endl;
   }
   cout << "end" << endl;
 }
@@ -82,4 +117,43 @@ void printMap(map<string, unsigned int> m){
   for(auto t : m){
     cout << t.first << " : " << t.second << endl;
   }
+}
+
+bool areCandidatesTied(map<string, unsigned int> candidates){
+  unsigned int value(-1);
+  for(auto c : candidates){
+    if(value == -1){
+      value = c.second;
+    } else {
+      if(value != c.second){
+	return false;
+      }
+    }
+  }
+  return true;
+}
+
+string getLowestCandidate(map<string, unsigned int> candidates){
+  string lowest_candidate;
+  unsigned int min(numeric_limits<int>::max());
+  for(auto c : candidates){
+    if(c.second < min){
+      min = c.second;
+      lowest_candidate = c.first;
+    }
+  }
+  return lowest_candidate;
+  
+}
+
+string getHighestCandidate(map<string, unsigned int> candidates){
+  string highest_candidate;
+  unsigned int max(0);
+  for(auto c : candidates){
+    if(c.second > max){
+      max = c.second;
+      highest_candidate = c.first;
+    }
+  }
+  return highest_candidate;
 }
