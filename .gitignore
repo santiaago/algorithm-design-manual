@@ -22,3 +22,6 @@
 
 # emacs
 *~
+
+# mac dust
+.DS_Store
