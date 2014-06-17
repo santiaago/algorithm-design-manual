@@ -11,6 +11,7 @@ using namespace std;
 double kEpsilon = 0.001;
 
 bool zeros(vector<double> v);
+double pround(double x, int precision);
 
 int main(){
   cout << "The trip" << endl;
@@ -24,7 +25,7 @@ int main(){
     count++;
   }
   double total_expenses = accumulate(expenses.begin(), expenses.end(), 0.0);
-  double avg_expenses = total_expenses / double(number_students);
+  double avg_expenses = pround(total_expenses / double(number_students), 2);
   cout << "total expenses: " << total_expenses << " avg expenses: " << avg_expenses << endl;
   for(int i = 0 ; i < number_students ; i++){
     cout << expenses[i] << " | ";
@@ -46,8 +47,12 @@ int main(){
     for(int i = 0 ; i < number_students ; i++){
       cout << expense_distribution[i] << " | ";
     }
-    while(expense_distribution[index] >= 0){
+    cout << endl;
+    while(expense_distribution[index] >= 0 && index < number_students){
       index++;
+    }
+    if(index >= number_students){
+      break;
     }
     cout << "current index " << index << endl;
     cout << "selected distribution: " << expense_distribution[index] << endl;
@@ -90,3 +95,15 @@ bool zeros(vector<double> v){
   }
   return true;
 }
+
+
+double pround(double x, int precision)
+{
+  if (x == 0.){
+    return x;
+  }
+  int ex = floor(log10(abs(x))) - precision + 1;
+  double div = pow(10, ex);
+  return floor(x / div + 0.5) * div;
+}
+
