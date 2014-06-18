@@ -13,7 +13,7 @@ using namespace std;
 template<typename T>
 void printVector(vector<T> v);
 void printMap(map<string, unsigned int> m);
-string getLowestCandidate(map<string, unsigned int> candidates);
+void getLowestCandidates(map<string, unsigned int> candidates, vector<string> &lowest_candidates);
 string getHighestCandidateFromMap(map<string, unsigned int> candidates);
 bool areCandidatesTied(map<string, unsigned int> candidates);
 void printVoteSummary(map<unsigned int, map<string, unsigned int> >candidate_votes);
@@ -21,12 +21,16 @@ void buildVoting(vector<string> &candidates,
 		 map<string, unsigned int> &map_candidate, 
 		 map<unsigned int, map<string, unsigned int> > &candidate_votes, 
 		 vector<vector<unsigned int> > &all_votes);
-
-string getHighestCandidateFromLowest(unsigned int lowest_candidate, 
-				     vector< vector<unsigned int> > all_votes, 
+void addWinners(vector<string> &winners,
+	       vector< vector<unsigned int> > all_votes, 
+	       map< unsigned int, map<string, unsigned int> > &candidate_votes,
+	       map<string, unsigned int> map_candidate,
+	       vector<string> candidates);
+string getHighestCandidateFromLowest(const unsigned int lowest_candidate, 
+				     const vector< vector<unsigned int> > all_votes, 
 				     map< unsigned int, map<string, unsigned int> > candidate_votes,
-				     map<string, unsigned int> map_candidate,
-				     vector<string> candidates);
+				     const map<string, unsigned int> map_candidate,
+				     const vector<string> candidates);
 
 int main(){
   cout << "Australian Voting" << endl;
@@ -43,40 +47,7 @@ int main(){
     vector<vector<unsigned int> > all_votes;
     
     buildVoting(candidates, map_candidate, candidate_votes, all_votes);
-
-    // look for winner
-    double mayority = all_votes.size()/double(2.0);
-    bool has_winner(false);
-
-    while(!has_winner){
-      // look for candidate with mayority
-      for(auto t : candidate_votes[1]){
-	if(t.second > mayority){
-	  winners.push_back(t.first);
-	  has_winner = true;
-	  break;
-	}
-      }
-      // mayority not found, remove lowest candidate.
-      // search for best candidate in votes where lowest candidate was first.
-      // give lowest candidate the votes of the best candidate.
-
-      if(!has_winner){
-	string lowest_candidate = getLowestCandidate(candidate_votes[1]);
-	string highest_candidate = getHighestCandidateFromLowest(map_candidate[lowest_candidate], all_votes, candidate_votes, map_candidate,candidates);
-	unsigned int votes_to_give = candidate_votes[1][lowest_candidate];
-	map<string, unsigned int>::iterator to_remove;
-	to_remove = candidate_votes[1].find(lowest_candidate);
-	candidate_votes[1].erase(to_remove);
-	candidate_votes[1][highest_candidate] += votes_to_give;
-      }
-      if(areCandidatesTied(candidate_votes[1])){
-	for(auto c : candidate_votes[1]){
-	  winners.push_back(c.first);
-	}
-	has_winner = true;
-      }
-    }
+    addWinners(winners, all_votes, candidate_votes, map_candidate, candidates);
     num_cases--;
   }
 
@@ -123,6 +94,51 @@ void buildVoting(vector<string> &candidates,
   printVoteSummary(candidate_votes);
 }
 
+void addWinners(vector<string> &winners,
+	       vector< vector<unsigned int> > all_votes, 
+	       map< unsigned int, map<string, unsigned int> > &candidate_votes,
+	       map<string, unsigned int> map_candidate,
+	       vector<string> candidates){
+
+  double mayority = all_votes.size()/double(2.0);
+  bool has_winner(false);
+  
+  while(!has_winner){
+    // look for candidate with mayority
+    for(auto t : candidate_votes[1]){
+      if(t.second > mayority){
+	winners.push_back(t.first);
+	has_winner = true;
+	break;
+      }
+      }
+    // mayority not found, remove lowest candidate.
+    // search for best candidate in votes where lowest candidate was first.
+    // give lowest candidate the votes of the best candidate.
+    
+    if(!has_winner){
+      vector<string> lowest_candidates;
+      getLowestCandidates(candidate_votes[1], lowest_candidates);
+      if(lowest_candidates.size() < candidate_votes[1].size()){
+	for(auto lowest_candidate : lowest_candidates){
+	  string highest_candidate = getHighestCandidateFromLowest(map_candidate[lowest_candidate], all_votes, candidate_votes, map_candidate,candidates);
+	  unsigned int votes_to_give = candidate_votes[1][lowest_candidate];
+	  map<string, unsigned int>::iterator to_remove;
+	  to_remove = candidate_votes[1].find(lowest_candidate);
+	  candidate_votes[1].erase(to_remove);
+	  candidate_votes[1][highest_candidate] += votes_to_give;
+	}
+      }
+    }
+    if(areCandidatesTied(candidate_votes[1])){
+      for(auto c : candidate_votes[1]){
+	winners.push_back(c.first);
+      }
+      has_winner = true;
+    }
+  }
+}
+
 template<typename T>
 void printVector(vector<T> v){
   for(T c : v){
@@ -151,24 +167,27 @@ bool areCandidatesTied(map<string, unsigned int> candidates){
   return true;
 }
 
-string getLowestCandidate(map<string, unsigned int> candidates){
-  string lowest_candidate;
+void getLowestCandidates(map<string, unsigned int> candidates, vector<string> &lowest_candidates){
+  // get minimum vote
   unsigned int min(numeric_limits<int>::max());
   for(auto c : candidates){
     if(c.second < min){
       min = c.second;
-      lowest_candidate = c.first;
     }
   }
-  return lowest_candidate;
-  
+  // get candidate with minimum vote
+  for(auto c: candidates){
+    if(c.second == min){
+      lowest_candidates.push_back(c.first);
+    }
+  }
 }
 
-string getHighestCandidateFromLowest(unsigned int lowest_candidate, 
-				     vector< vector<unsigned int> > all_votes, 
-				     map< unsigned int, map<string, unsigned int> > candidate_votes, 
-				     map<string, unsigned int> map_candidate,
-				     vector<string> candidates){
+string getHighestCandidateFromLowest(const unsigned int lowest_candidate,
+				     const vector< vector<unsigned int> > all_votes,
+				     map< unsigned int, map<string, unsigned int> > candidate_votes,
+				     const map<string, unsigned int> map_candidate,
+				     const vector<string> candidates){
   string highest_candidate;
 
   // find all votes where the lowest_candidate was vote as 1st candidate and count 2nd votes.
@@ -178,9 +197,7 @@ string getHighestCandidateFromLowest(unsigned int lowest_candidate,
       votes[candidates[all_votes[i][1] - 1]]++;
     }
   }
-  // for(auto v : votes){
-  //   cout << v.first << " : " << v.second << endl;
-  // }
+
   bool found(false);
   while(!found){
     highest_candidate = getHighestCandidateFromMap(votes);
