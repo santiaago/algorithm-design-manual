@@ -120,9 +120,9 @@ void addWinners(CandidatesVector &winners, const VotesVector &all_votes, VotingM
   while(!has_winner){
 
     // look for candidate with mayority
-    for(auto t : candidate_votes[1]){
-      if(t.second > mayority){
-	winners.push_back(t.first);
+    for(CandidatesVoteMap::iterator c = candidate_votes[1].begin(); c != candidate_votes[1].end(); c++){
+      if(c->second > mayority){
+	winners.push_back(c->first);
 	has_winner = true;
 	break;
       }
@@ -138,15 +138,15 @@ void addWinners(CandidatesVector &winners, const VotesVector &all_votes, VotingM
       CandidatesVector lowest_candidates;
       getLowestCandidates(candidate_votes[1], lowest_candidates);
       if(lowest_candidates.size() < candidate_votes[1].size()){
-	for(auto lowest_candidate : lowest_candidates){
-	  CandidatesPositionMap::const_iterator lowest = candidates_position.find(lowest_candidate);
+	for(CandidatesVector::const_iterator lowest_candidate = lowest_candidates.begin(); lowest_candidate != lowest_candidates.end(); lowest_candidate++){
+	  CandidatesPositionMap::const_iterator lowest = candidates_position.find(*lowest_candidate);
 	  if(lowest == candidates_position.end()){
 	    continue;
 	  }
 	  string highest_candidate = getHighestCandidateFromLowest(lowest->second, all_votes, candidate_votes, candidates);
-	  unsigned int votes_to_give = candidate_votes[1][lowest_candidate];
+	  unsigned int votes_to_give = candidate_votes[1][*lowest_candidate];
 	  CandidatesVoteMap::iterator to_remove;
-	  to_remove = candidate_votes[1].find(lowest_candidate);
+	  to_remove = candidate_votes[1].find(*lowest_candidate);
 	  if(to_remove == candidate_votes[1].end()){
 	    continue;
 	  }
@@ -158,8 +158,8 @@ void addWinners(CandidatesVector &winners, const VotesVector &all_votes, VotingM
 
     // if candidates in first position are all tied, they are all winners.
     if(areCandidatesTied(candidate_votes[1])){
-      for(auto c : candidate_votes[1]){
-	winners.push_back(c.first);
+      for(CandidatesVoteMap::iterator c = candidate_votes[1].begin(); c != candidate_votes[1].end(); c++){
+	winners.push_back(c->first);
       }
       has_winner = true;
     }
@@ -170,15 +170,15 @@ void addWinners(CandidatesVector &winners, const VotesVector &all_votes, VotingM
 void getLowestCandidates(const CandidatesVoteMap &candidates, CandidatesVector &lowest_candidates){
   // get minimum vote
   unsigned int min(numeric_limits<int>::max());
-  for(auto c : candidates){
-    if(c.second < min){
-      min = c.second;
+  for(CandidatesVoteMap::const_iterator c = candidates.begin(); c != candidates.end(); c++){
+    if(c->second < min){
+      min = c->second;
     }
   }
   // get candidate with minimum vote
-  for(auto c: candidates){
-    if(c.second == min){
-      lowest_candidates.push_back(c.first);
+  for(CandidatesVoteMap::const_iterator c = candidates.begin(); c != candidates.end(); c++){
+    if(c->second == min){
+      lowest_candidates.push_back(c->first);
     }
   }
 }
@@ -203,7 +203,7 @@ string getHighestCandidateFromLowest(const unsigned int lowest_candidate, const 
     highest_candidate = getHighestCandidateFromMap(votes);
     CandidatesVoteMap::iterator it;
     it = candidate_votes[1].find(highest_candidate);
-    if(it != candidate_votes[1].cend()){
+    if(it != candidate_votes[1].end()){
       found = true;
     }else{
       CandidatesVoteMap::iterator to_remove;
@@ -218,10 +218,10 @@ string getHighestCandidateFromLowest(const unsigned int lowest_candidate, const 
 string getHighestCandidateFromMap(const CandidatesVoteMap &candidates){
   string highest_candidate;
   unsigned int max(0);
-  for(auto c : candidates){
-    if(c.second > max){
-      max = c.second;
-      highest_candidate = c.first;
+  for(CandidatesVoteMap::const_iterator c = candidates.begin(); c != candidates.end(); c++){
+    if(c->second > max){
+      max = c->second;
+      highest_candidate = c->first;
     }
   }
   return highest_candidate;
@@ -230,11 +230,11 @@ string getHighestCandidateFromMap(const CandidatesVoteMap &candidates){
 // Determine whether all candidates are tied in votes or not based on the candidates votes.
 bool areCandidatesTied(const CandidatesVoteMap &candidates){
   unsigned int value(-1);
-  for(auto c : candidates){
+  for(CandidatesVoteMap:: const_iterator c = candidates.begin(); c != candidates.end(); c++){
     if(value == -1){
-      value = c.second;
+      value = c->second;
     } else {
-      if(value != c.second){
+      if(value != c->second){
 	return false;
       }
     }
