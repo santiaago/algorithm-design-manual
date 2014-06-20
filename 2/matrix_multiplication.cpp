@@ -52,11 +52,10 @@ int** matrix_multiplication(int** a, int** b, int size){
   }
   for(int i = 0; i < size; i++){
     for(int j = 0; j < size; j++){
-      int sum(0);
+      c[i][j] = 0;
       for(int k = 0; k < size; k++){
-	sum += a[i][j]*b[k][j];
+	c[i][j] += a[i][j]*b[k][j];
       }
-      c[i][j] = sum;
     }
   }
   return c;
