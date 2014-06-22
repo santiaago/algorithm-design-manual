@@ -4,13 +4,13 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <cstdio>
 
 using namespace std;
 
 int carry(char a, char b, int previous_carry);
 
 int main(){
-  cout << "Primary Arithmetic" << endl;
   bool canRead(true);
 
   vector<string> output;
@@ -36,16 +36,12 @@ int main(){
       continue;
     }
 
-    cout << "|a:" << a << "|" << endl;
-    cout << "|b:" << b << "|" << endl;
     int cursor(0);
     int current_carry(0);
 
     int number_of_carry(0);
     for(int i = a.size() -1; i >=0; i--){
       int j = b.size() - 1 -cursor;
-      cout << "a:"<< a[i] << endl;
-      cout << "b:"<< b[j] << endl;
       int c  = carry(a[i], b[j], current_carry);
       if(c > 0){
 	current_carry = c;
@@ -55,6 +51,7 @@ int main(){
       }
       cursor++;
     }
+
     if(number_of_carry ==  1){
       char phrase[50];
       sprintf(phrase, "%d carry operation.", number_of_carry);
@@ -66,11 +63,13 @@ int main(){
       sprintf(phrase, "%d carry operations.", number_of_carry);
       output.push_back(phrase);
     }
+
   }
+
   for(int i = 0; i < output.size(); i++){
     cout << output[i] << endl;
   }
-  cout << "end" << endl;
+
 }
 
 int carry(char a, char b, int previous_carry){
