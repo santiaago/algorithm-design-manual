@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdio>
+//#include <cstdio>
 
 using namespace std;
 
@@ -12,7 +13,7 @@ int carry(char a, char b, int previous_carry);
 
 int main(){
   bool canRead(true);
-
+  
   vector<string> output;
   while(canRead){
     string line;
@@ -35,14 +36,27 @@ int main(){
       canRead = false;
       continue;
     }
-
+    
     int cursor(0);
     int current_carry(0);
-
+    
     int number_of_carry(0);
+
+    // set a to be the biggest of the two numbers.
+    string t;
+    if(a.size() < b.size()){
+      t = b;
+      b = a;
+      a = t;
+    }
     for(int i = a.size() -1; i >=0; i--){
-      int j = b.size() - 1 -cursor;
-      int c  = carry(a[i], b[j], current_carry);
+      int j = b.size() - 1 - cursor;
+      int c;
+      if(j < 0){
+	c = carry(a[i], '0', current_carry);
+      } else{
+	c = carry(a[i], b[j], current_carry);
+      }
       if(c > 0){
 	current_carry = c;
 	number_of_carry++;
@@ -63,21 +77,22 @@ int main(){
       sprintf(phrase, "%d carry operations.", number_of_carry);
       output.push_back(phrase);
     }
-
+    
   }
-
+  
   for(int i = 0; i < output.size(); i++){
     cout << output[i] << endl;
   }
-
+  
 }
 
 int carry(char a, char b, int previous_carry){
-      int ia, ib;
-      ia = a - '0';
-      ib = b - '0';
-      if(previous_carry + ia + ib > 9){
-        return 1;//(previous_carry + ia + ib -9);
-      }
-      return 0;
+  int ia, ib;
+  ia = a - '0';
+  ib = b - '0';
+  
+  if(previous_carry + ia + ib > 9){
+    return 1;
+  }
+  return 0;
 }
