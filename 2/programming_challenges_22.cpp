@@ -4,18 +4,19 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-//#include <stdlib.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string>
 
 using namespace std;
+
+const double kEpsilon = 0.0000000001;
 
 void computeIntervals(vector< pair<double, double> > &v1, vector< pair<double, double> > &v2, double log_number);
 bool isValueComputed(const vector< pair<double, double> > &v1, const vector< pair<double, double> > &v2, double e);
 int getWinner(const vector< pair<double, double> > &v1, const vector< pair<double, double> > &v2, double e);
 
 int main(){
-  cout << "A Multiplication Game" << endl;
   vector< pair<double, double> > stan_intervals;
   vector< pair<double, double> > ollie_intervals;
 
@@ -26,7 +27,7 @@ int main(){
   string line;
   while(getline(cin, line, '\n')){
 
-    long current_number = stol(line);
+    long current_number = atol(line.c_str());
     double log_number = log(current_number);
     
     if(!isValueComputed(stan_intervals, ollie_intervals, log_number)){
@@ -79,24 +80,25 @@ int getWinner(const vector< pair<double, double> > &v1, const vector< pair<doubl
 
   // searching in v1
   for(int i = 0; i < v1.size(); i++){
-    if( e >= v1[i].first && e <= v1[i].second ){
+    if( (e - v1[i].first) >= -kEpsilon && (v1[i].second - e) >= -kEpsilon ){
       return 1;
     } else {
-      if( e <= v1[i].first){
+      if( (v1[i].first - e) >= -kEpsilon){
 	break;
       }
     }
   }
   // searching in v2
   for(int i = 0; i < v2.size(); i++){
-    if( e >= v2[i].first && e <= v2[i].second){
+    if( (e - v2[i].first) >= -kEpsilon && (v2[i].second - e) >= -kEpsilon){
       return 2;
     } else {
-      if( e <= v2[i].first){
+      if( (v2[i].first - e) >= -kEpsilon){
 	break;
       }
     }
   }
+
   return 0;
 }
 
